@@ -2,7 +2,7 @@
 
 *Meta — questioning about questioning. Question yourself till you're left with only answers.*
 
-**697 questions a senior engineer asks before writing code — packaged as a Claude skill, a portable prompt, and a plain checklist.**
+**697 questions a senior engineer asks before writing code — packaged as a skill, a portable prompt, and a plain checklist.**
 
 LLMs and coding agents tend to start typing immediately. This makes them stop and interrogate the request first, the way an experienced engineer would: one yes/no question at a time, routed to the domains that actually apply, stopping the moment you say "enough, just build it."
 
