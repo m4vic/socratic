@@ -9,13 +9,12 @@
 </p>
 
 
+**697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
 **Socratic is a self-interrogation skill for agentic AI systems.**
 
 It helps an LLM slow down, inspect the task, ask itself the right engineering questions, and only ask the user for the few decisions that actually require human authority.
 
 Not a form. Not a checklist. A lightweight reasoning loop.
-
-**697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
 
 ## How it actually works
 
