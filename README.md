@@ -5,7 +5,7 @@
 <h1 align="center">Socratic</h1>
 
 <p align="center">
-  *Meta - questioning about questioning. Question yourself till you're left with only answers.*
+  Meta - questioning about questioning. Question yourself till you're left with only answers.
 </p>
 
 **697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
