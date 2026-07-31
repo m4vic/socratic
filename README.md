@@ -1,118 +1,120 @@
----
-name: socratic
-description: Meta — questioning about questioning. Question yourself till you're left with only answers. Use whenever the user asks to build, design, scaffold, or architect any system, feature, service, app, agent, pipeline, connector, or tool — especially when the request is short, vague, or underspecified. By default the agent interrogates ITSELF silently across the relevant engineering domains (frontend, backend, data, security, infra, AI/LLM, mobile, API, testing, product, cost, compliance) and reasons its way to answers, surfacing only the few decisions that truly need the user's input. Also use when reviewing an existing design for gaps, or when the user says "what am I missing," "review this architecture," or "ask me the right questions."
----
-
 # Socratic
 
-Question yourself till you're left with only answers.
+*Meta — questioning about questioning. Question yourself till you're left with only answers.*
 
-A curated bank of ~700 questions a senior engineer asks before and during a build, split by domain. **The default mode is self-interrogation, not interviewing the user.** The agent runs the question bank on itself — reads the codebase, applies engineering defaults, reasons through each relevant question — and only turns to the user for the small number of decisions nobody but them can make.
+**697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
 
-## Two modes
+## How it actually works
 
-**Mode A — Self-interrogation (default).** The agent asks itself, answers itself, shows its work once at the end. This is what runs unless the user asks otherwise.
+**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call). You see the outcome — a short "here's what I considered and assumed" summary — not 700 questions.
 
-**Mode B — Interactive interview (opt-in).** The agent asks the user one yes/no question at a time. Only enter this mode if the user says something like "ask me," "interview me," "walk me through it," or "let's go one at a time." See the Interactive Mode section at the bottom.
+If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
-If unsure which the user wants, default to Mode A. Silence is not a request to be interviewed.
+## What's in it
 
----
+| Domain | Questions | File |
+|---|---|---|
+| Requirements & scope | 40 | [`questions/00-requirements.md`](questions/00-requirements.md) |
+| Frontend & UI | 46 | [`questions/01-frontend.md`](questions/01-frontend.md) |
+| Backend & services | 45 | [`questions/02-backend.md`](questions/02-backend.md) |
+| Data & storage | 53 | [`questions/03-data.md`](questions/03-data.md) |
+| API design | 48 | [`questions/04-api.md`](questions/04-api.md) |
+| Security | 59 | [`questions/05-security.md`](questions/05-security.md) |
+| Infrastructure & DevOps | 46 | [`questions/06-infra.md`](questions/06-infra.md) |
+| Testing & quality | 38 | [`questions/07-testing.md`](questions/07-testing.md) |
+| Observability & ops | 39 | [`questions/08-observability.md`](questions/08-observability.md) |
+| AI / LLM / agents | 70 | [`questions/09-ai-llm.md`](questions/09-ai-llm.md) |
+| Mobile & offline | 41 | [`questions/10-mobile.md`](questions/10-mobile.md) |
+| Product & UX | 45 | [`questions/11-product-ux.md`](questions/11-product-ux.md) |
+| Cost & performance | 42 | [`questions/12-cost-performance.md`](questions/12-cost-performance.md) |
+| Compliance & legal | 42 | [`questions/13-compliance.md`](questions/13-compliance.md) |
+| Team & maintenance | 43 | [`questions/14-team-maintenance.md`](questions/14-team-maintenance.md) |
 
-## Mode A — Self-interrogation
+Every file follows the same shape: **Priority 1** questions first, then thematic sections, then a **Verification** block to run *after* the build.
 
-### 1. Build the working domain set (dynamic)
+## Dynamic domain selection
 
-Always include:
-- `questions/00-requirements.md`
-- `questions/07-testing.md` — every build gets a testing pass, not just ones where testing was explicitly requested
+The domain set isn't chosen once from the initial request — it's built by scanning for signals and can grow mid-build. Requirements and Testing are always in. Everything else gets pulled in when it matches:
 
-Then scan the request **and** the existing codebase (if any) for signals, and add every domain that matches. Err toward including a domain over skipping it — self-answering extra questions is free; the user never sees the raw list.
-
-| Signal in the request or code | Add domain(s) |
+| Signal | Domains added |
 |---|---|
-| UI, page, component, dashboard, form, "frontend" | `01-frontend.md` |
-| service, endpoint, job, queue, "backend", business logic | `02-backend.md` |
-| database, schema, store, persist, migration, cache | `03-data.md` |
-| API, SDK, webhook, **connector**, integration, third-party service, OAuth | `04-api.md` |
-| auth, login, user accounts, payments, secrets, external input, public-facing | `05-security.md` |
-| deploy, CI/CD, container, cloud, scaling, "infra" | `06-infra.md` |
-| production, "will run unattended", cron, monitoring | `08-observability.md` |
-| AI, LLM, agent, prompt, model, RAG, tool-use, chatbot | `09-ai-llm.md` |
-| mobile, iOS, Android, offline, PWA | `10-mobile.md` |
-| anything user-facing at all | `11-product-ux.md` |
-| scale, latency, "will this be expensive", high traffic | `12-cost-performance.md` |
-| personal data, payments, health, users in EU/CA, minors | `13-compliance.md` |
-| "will be maintained", team project, long-lived | `14-team-maintenance.md` |
+| UI, dashboard, form | Frontend |
+| service, job, queue | Backend |
+| database, schema, cache | Data |
+| API, SDK, webhook, **connector**, integration | API |
+| auth, payments, secrets, public-facing | Security |
+| deploy, CI/CD, cloud, scaling | Infra |
+| production, cron, monitoring | Observability |
+| AI, LLM, agent, prompt, RAG | AI/LLM |
+| mobile, iOS, Android, offline | Mobile |
+| anything user-facing | Product/UX |
+| scale, latency, high traffic | Cost/Performance |
+| personal data, health, EU/CA users | Compliance |
+| long-lived, team project | Team/Maintenance |
 
-Connectors and integrations are a good example of why this has to be dynamic: a "tool with connectors" isn't just an API question. It pulls in `04-api.md` (contract, auth to the third party, rate limits), `05-security.md` (secrets for each connector, what happens if one is compromised), and `07-testing.md` (mocking each connector, testing what happens when one is down) all at once. Don't stop at the first obviously-matching domain — check the whole table.
+A "tool with connectors" isn't just an API question — it pulls in API (contract, third-party auth), Security (credential storage per connector, blast radius if one leaks), and Testing (mocking each connector's failure modes) together. If self-answering later reveals a new need — say, a persistent store you didn't expect — the scan re-runs and adds Data mid-task.
 
-**This set is not fixed at the start.** If self-answering a question in one domain reveals a new characteristic — e.g. answering a backend question makes clear the system needs a persistent store — re-scan and pull in the newly relevant domain (here, `03-data.md`) before continuing. Keep doing this until a full pass produces no new domains.
+## Three ways to use it
 
-### 2. Self-answer every question in the working set
+### 1. As a Claude Code skill
 
-For each question, resolve it yourself, in this order:
-
-1. **Read first.** Check the codebase, existing config, prior conversation, or repo conventions. If the answer is already decided somewhere, use it — don't re-ask what you can look up.
-2. **Apply the engineering default.** Most questions in the bank have an obvious, defensible default for the type of system being built (see each domain file's Priority 1 section for the highest-value ones). Take it. Record it as **Assumed**.
-3. **Escalate only if neither applies AND the answer is a business/authority decision, not an engineering one** — budget, which vendor, target market, legal risk tolerance, an irreversible action, or something that materially changes what's being delivered. These become **Open questions for the user**. Everything else gets answered by you.
-
-Do this silently. The user does not see 700 questions go by — they see the output contract below.
-
-### 3. Emit the output contract once, before writing code
-
-```
-Domains considered: <list, one line each on why it was pulled in>
-Self-answered highlights: <5-10 bullets — the decisions that most shaped the design, not all of them>
-Assumed (flag if wrong): <the defaults you took>
-Open questions for you: <ideally 0-3 — only things nobody but the user could decide>
-Top risks: <one line each, from whichever domains flagged them>
-Plan: <what you're about to build>
+```bash
+mkdir -p ~/.claude/skills
+cp -r socratic ~/.claude/skills/
 ```
 
-If "Open questions" is non-empty, ask them now — batched, not one at a time (batching is fine here because these are the rare genuinely-blocking ones, not the full interrogation).
+### 2. As a Codex skill
 
-### 4. Build
+Codex uses a different skill directory (`.agents/skills`, not `.claude/skills`):
 
-### 5. Verify
+```bash
+mkdir -p ~/.agents/skills
+cp -r socratic ~/.agents/skills/
+```
 
-Run the **Verification** section of every domain in the final working set — not just the ones for domains the user explicitly asked about. `07-testing.md`'s verification list runs every time, since a tool was created. Report what passed and what couldn't be verified without the user's help (e.g., "can't load-test without your staging environment").
+Invoke explicitly with `$socratic`, or let it trigger implicitly when your request matches.
 
-### Budget note
+### 3. As a portable prompt
 
-Self-interrogation is cheap — there's no reason to skip domains to save the user's time, since the user isn't in the loop for the silent pass. The place to economize is the **Open questions** list: keep that as close to zero as the task allows. A trivial script might have a working domain set of just `00` + `07` and zero open questions. A payments feature might pull in six domains and still land on 1-2 open questions (which processor, what's the fraud tolerance) — everything else gets a defensible default.
+Paste [`PROMPT.md`](PROMPT.md) into the system prompt of any LLM — ChatGPT, Gemini, a local model, your own agent framework. Self-contained, no file dependencies.
 
----
+## The self-interrogation loop
 
-## Interactive Mode (opt-in — only when asked)
+```
+Scan request + codebase → build working domain set (dynamic, can grow mid-build)
+   ↓
+Self-answer every question: read codebase → apply engineering default → escalate only if it's a business decision
+   ↓
+Emit contract once: domains / highlights / assumed / open questions (0-3 ideally) / risks / plan
+   ↓
+Ask the (few) open questions, if any — batched
+   ↓
+Build
+   ↓
+Run Verification for every domain in the final set, including ones added mid-build
+```
 
-If the user asks to be interviewed instead of having the agent self-answer, switch to this loop:
+## Design principles
 
-1. Build the same dynamic domain set as Mode A.
-2. Ask ONE question at a time, phrased with a proposed default: *"I'm assuming X. Is that OK?"*
-3. **Yes** → next question. **No + correction** → absorb it, continue. **No / "just build it" / a one-word answer twice in a row** → stop immediately, fall back to Mode A for everything unanswered, and build.
-4. Question budget by stakes: throwaway script 0-2, prototype 3-6, production 8-15, money/PII/health 15-25.
-5. Emit the same output contract as Mode A before building.
+- **Self-answer by default.** The bank exists so the agent has more engineering perspective, not so the user fills out a form.
+- **Read before assuming; assume before asking.** Escalation to the user is the last resort, reserved for decisions only they can authorize.
+- **Domain set is dynamic.** It's built from signals in the request and code, and can grow as the agent learns more mid-task — not fixed at the first guess.
+- **Testing runs every time.** Not gated behind the user asking for it — any tool/service/script that gets built gets its testing questions and verification pass.
+- **Keep "Open questions" near zero.** A long list of open questions means engineering decisions got escalated that shouldn't have been.
+- **Interactive mode is opt-in**, for when a user explicitly wants to be walked through it live.
 
-## Anti-patterns
+## Extending it
 
-- Don't ask the user all 700 questions, batched or one at a time, by default. That's Mode B, and Mode B is opt-in.
-- Don't skip the self-interrogation pass just because the task sounds simple — run it, it just resolves to a short domain set and an empty open-questions list.
-- Don't surface an "Assumed" item as an "Open question" just to be safe. If there's a defensible engineering default, take it and move on.
-- Don't let "Open questions for you" grow past a handful. If it's long, you're escalating engineering decisions that should have been self-answered.
-- Don't skip Verification for domains you silently added — if you pulled in `05-security.md` because the task turned out to need auth, its verification checks run too.
+Add a domain by dropping `questions/15-yourdomain.md` in, following the existing shape (Priority 1 → sections → Verification), then add a row to the signal table in `SKILL.md` and `PROMPT.md` so it gets picked up dynamically.
 
-## Preset domain combos (still useful as a sanity check on the dynamic scan)
+## License
 
-| Building | Should end up with at least |
-|---|---|
-| CRUD web app | 00, 01, 02, 03, 05, 07 |
-| Public API / SDK | 00, 02, 04, 05, 08, 12, 07 |
-| Tool with connectors/integrations | 00, 04, 05, 07, + whatever each connector touches (data, AI, etc.) |
-| AI agent / chatbot | 00, 09, 05, 12, 08, 11, 07 |
-| RAG pipeline | 00, 09, 03, 12, 13, 07 |
-| Data pipeline / ETL | 00, 03, 06, 08, 13, 07 |
-| Mobile app | 00, 10, 01, 05, 11, 07 |
-| Infra change | 00, 06, 08, 12, 14, 07 |
-| Payments feature | 00, 02, 03, 05, 13, 07 (all mandatory) |
-| One-off script | 00, 07 only |
+MIT — see [LICENSE](LICENSE). Use it, fork it, ship it.
+
+## Contributing
+
+PRs welcome, especially:
+
+- Domains not covered (embedded, games, blockchain, hardware, accessibility-in-depth)
+- Questions that came from a real incident — those are the good ones
+- Better signal words for dynamic domain detection
