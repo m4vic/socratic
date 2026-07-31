@@ -1,4 +1,0 @@
-interface:
-  display_name: "Socratic"
-  short_description: "Self-interrogating engineering design review"
-  default_prompt: "Use $socratic to self-review this build before implementation."
