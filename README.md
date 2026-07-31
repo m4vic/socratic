@@ -1,6 +1,12 @@
-# Socratic
+<p align="center">
+  <img src="assets/1logo.png" alt="Socratic Logo" width="180">
+</p>
 
-*Meta - questioning about questioning. Question yourself till you're left with only answers.*
+<h1 align="center">Socratic</h1>
+
+<p align="center">
+  *Meta - questioning about questioning. Question yourself till you're left with only answers.*
+</p>
 
 **697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
 
