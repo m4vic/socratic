@@ -5,21 +5,146 @@
 <h1 align="center">Socratic</h1>
 
 <p align="center">
-  Meta - questioning about questioning. Question yourself till you're left with only answers.
+  Meta — questioning about questioning. Question yourself till you're left with only answers.
 </p>
 
-**697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
+<p align="center">
+  A self-interrogation skill for agentic AI systems.
+</p>
 
-## How it actually works
+Socratic is a curated engineering question system packaged as a Codex/Claude skill and a portable prompt.
 
-**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call). You see the outcome — a short "here's what I considered and assumed"
+It helps an AI system slow down, inspect the task, ask itself the right questions, surface risks, make reasonable engineering defaults, and only ask the human for the few decisions that actually require human authority.
 
-If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
+This is not a form for the user to fill out.
 
-## What's in it
+It is a lightweight self-questioning loop for task completion.
+
+## What it does
+
+Instead of immediately generating code from a vague request, Socratic makes the model do this first:
+
+1. Classify the task.
+2. Select the relevant engineering domains.
+3. Load the smallest useful question set.
+4. Ask itself the important questions silently.
+5. Read the codebase and available context before assuming.
+6. Apply engineering defaults where possible.
+7. Escalate only the decisions the user must own.
+8. Build.
+9. Verify.
+
+That means the model interviews itself, not you.
+
+## Why it exists
+
+Most agentic systems fail for a simple reason: they start executing too early.
+
+They miss requirements, security implications, edge cases, operational constraints, testing gaps, and hidden trade-offs. Socratic adds a structured internal loop before execution so the model can reason more like a senior engineer and less like autocomplete.
+
+You can think of it as a compact reasoning layer for:
+
+- task clarification
+- domain-aware planning
+- self-interrogation
+- risk detection
+- assumption control
+- verification gating
+
+## Core idea
+
+Socratic turns a static prompt into a task-adaptive loop.
+
+```text
+Task arrives
+  ↓
+Scan request and project
+  ↓
+Choose relevant domains
+  ↓
+Load Core or Full depth
+  ↓
+Self-interrogate silently
+  ↓
+Surface assumptions, risks, and only the necessary open questions
+  ↓
+Execute
+  ↓
+Verify
+```
+
+This is why Socratic is more than a list of questions. The questions are the mechanism that powers the loop.
+
+## Core and Full modes
+
+The full question bank contains 697 questions across engineering domains.
+
+That is useful for production-grade, high-risk, or audit-style work, but too expensive to load by default for many agentic workflows.
+
+So Socratic now has two depths:
+
+### Core
+
+Core is the default path.
+
+It loads the highest-signal subset of questions first: roughly the top 90 questions that matter most across routine, prototype, internal, and moderately scoped work.
+
+Use Core for:
+
+- prototypes
+- internal tools
+- one-off builds
+- medium-scope engineering work
+- most day-to-day agentic tasks
+
+### Full
+
+Full loads the complete domain files.
+
+Use Full for:
+
+- production systems
+- public APIs
+- authentication
+- payments
+- PII or regulated data
+- autonomous tools
+- costly or irreversible actions
+- deep audits
+- explicit high-risk reviews
+
+### Why this split matters
+
+The point is not to ask more questions.
+
+The point is to ask the most useful questions at the right time without burning unnecessary context.
+
+## How it actually behaves
+
+By default, Socratic does silent self-interrogation.
+
+It reads the request, inspects the codebase, selects the relevant domains, answers what it can internally, and only asks the user about decisions that are genuinely theirs to make, such as:
+
+- budget
+- vendor choice
+- legal risk tolerance
+- product priority
+- irreversible business decisions
+
+If the user wants to be interviewed live, they can opt in with prompts like:
+
+- "interview me"
+- "ask one at a time"
+- "walk me through the decisions"
+
+Otherwise, Socratic stays out of the way and focuses on helping the model complete the task.
+
+## Question domains
+
+The full bank currently covers 15 domains:
 
 | Domain | Questions | File |
-|---|---|---|
+|---|---:|---|
 | Requirements & scope | 40 | [`questions/00-requirements.md`](questions/00-requirements.md) |
 | Frontend & UI | 46 | [`questions/01-frontend.md`](questions/01-frontend.md) |
 | Backend & services | 45 | [`questions/02-backend.md`](questions/02-backend.md) |
@@ -36,91 +161,177 @@ If you'd rather be interviewed live, ask for it ("interview me," "ask me one at 
 | Compliance & legal | 42 | [`questions/13-compliance.md`](questions/13-compliance.md) |
 | Team & maintenance | 43 | [`questions/14-team-maintenance.md`](questions/14-team-maintenance.md) |
 
-Every file follows the same shape: **Priority 1** questions first, then thematic sections, then a **Verification** block to run *after* the build.
+Each file follows the same shape:
+
+- Priority 1 questions
+- themed sections
+- Verification block
+
+The `questions/core/` folder contains the compact high-signal versions used for default operation.
 
 ## Dynamic domain selection
 
-The domain set isn't chosen once from the initial request — it's built by scanning for signals and can grow mid-build. Requirements and Testing are always in. Everything else gets pulled in when it matches:
+Socratic does not load everything.
 
-| Signal | Domains added |
+It builds the working domain set dynamically based on the request and the codebase.
+
+Requirements and Testing are always included. Other domains are added only when they are relevant.
+
+| Signal | Domain |
 |---|---|
-| UI, dashboard, form | Frontend |
-| service, job, queue | Backend |
-| database, schema, cache | Data |
-| API, SDK, webhook, **connector**, integration | API |
-| auth, payments, secrets, public-facing | Security |
-| deploy, CI/CD, cloud, scaling | Infra |
-| production, cron, monitoring | Observability |
-| AI, LLM, agent, prompt, RAG | AI/LLM |
-| mobile, iOS, Android, offline | Mobile |
-| anything user-facing | Product/UX |
-| scale, latency, high traffic | Cost/Performance |
-| personal data, health, EU/CA users | Compliance |
-| long-lived, team project | Team/Maintenance |
+| UI, page, component, dashboard, form, frontend | Frontend |
+| service, endpoint, job, queue, backend, business logic | Backend |
+| database, schema, storage, migration, cache | Data |
+| API, SDK, webhook, connector, integration, OAuth | API |
+| auth, accounts, payments, secrets, public exposure | Security |
+| deployment, CI/CD, containers, cloud, scaling | Infra |
+| production, unattended work, cron, monitoring | Observability |
+| AI, LLM, agent, prompt, model, RAG, tool use | AI/LLM |
+| mobile, iOS, Android, offline, PWA | Mobile |
+| onboarding, workflow, CLI, user-facing errors | Product/UX |
+| scale, latency, traffic, token spend, cloud spend | Cost/Performance |
+| personal data, health, finance, minors, licensing | Compliance |
+| long-lived, team-owned, maintained systems | Team/Maintenance |
 
-A "tool with connectors" isn't just an API question — it pulls in API (contract, third-party auth), Security (credential storage per connector, blast radius if one leaks), and Testing (mocking each connector's failure modes) together. If self-answering later reveals a new need — say, a persistent store you didn't expect — the scan re-runs and adds Data mid-task.
+If a domain reveals another dependency during reasoning, Socratic expands the set mid-task.
 
-## Three ways to use it
+That is important. A real task is often wider than the first user message suggests.
 
-### 1. As a Claude Code skill
+## Self-interrogation contract
+
+Before implementation, Socratic pushes the model to arrive at a compact internal contract like this:
+
+```text
+Domains considered: what mattered and why
+Self-answered highlights: the key decisions already resolved
+Assumed (flag if wrong): important defaults taken
+Open questions for you: only authority decisions
+Top risks: the main engineering risks
+Plan: what will be built
+```
+
+That is the real output of the questioning loop.
+
+Not the raw 697 questions.
+
+## Design principles
+
+- Self-answer by default.
+- Read before assuming.
+- Assume before asking.
+- Ask the user only when authority is required.
+- Load the smallest sufficient context.
+- Escalate from Core to Full only when the task justifies it.
+- Keep testing and verification attached to the build.
+- Treat questions as execution scaffolding, not conversation filler.
+
+## Installation
+
+### Claude Code
 
 ```bash
 mkdir -p ~/.claude/skills
 cp -r socratic ~/.claude/skills/
 ```
 
-### 2. As a Codex skill
+### Codex
 
-Codex uses a different skill directory (`.agents/skills`, not `.claude/skills`):
+Install into `$CODEX_HOME/skills`.
+
+If `CODEX_HOME` is unset, use `~/.codex/skills`.
 
 ```bash
-mkdir -p ~/.agents/skills
-cp -r socratic ~/.agents/skills/
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -r socratic "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-Invoke explicitly with `$socratic`, or let it trigger implicitly when your request matches.
+Invoke explicitly with `$socratic`, or let it trigger implicitly when the task matches.
 
-### 3. As a portable prompt
+## Portable prompts
 
-Paste [`PROMPT.md`](PROMPT.md) into the system prompt of any LLM — ChatGPT, Gemini, a local model, your own agent framework. Self-contained, no file dependencies.
+Socratic also includes portable prompts:
 
-## The self-interrogation loop
+- [`PROMPT.md`](PROMPT.md): stronger, fuller version
+- [`PROMPT_LITE.md`](PROMPT_LITE.md): lighter version for smaller tasks or tighter token budgets
 
-```
-Scan request + codebase → build working domain set (dynamic, can grow mid-build)
-   ↓
-Self-answer every question: read codebase → apply engineering default → escalate only if it's a business decision
-   ↓
-Emit contract once: domains / highlights / assumed / open questions (0-3 ideally) / risks / plan
-   ↓
-Ask the (few) open questions, if any — batched
-   ↓
-Build
-   ↓
-Run Verification for every domain in the final set, including ones added mid-build
-```
+Use them when you want the behavior without installing the full skill.
 
-## Design principles
+## When to use it
 
-- **Self-answer by default.** The bank exists so the agent has more engineering perspective, not so the user fills out a form.
-- **Read before assuming; assume before asking.** Escalation to the user is the last resort, reserved for decisions only they can authorize.
-- **Domain set is dynamic.** It's built from signals in the request and code, and can grow as the agent learns more mid-task — not fixed at the first guess.
-- **Testing runs every time.** Not gated behind the user asking for it — any tool/service/script that gets built gets its testing questions and verification pass.
-- **Keep "Open questions" near zero.** A long list of open questions means engineering decisions got escalated that shouldn't have been.
-- **Interactive mode is opt-in**, for when a user explicitly wants to be walked through it live.
+Use Socratic when the task is:
+
+- vague
+- underspecified
+- multi-step
+- production-sensitive
+- cross-domain
+- agentic
+- likely to hide security, testing, or architecture risks
+
+It is especially useful for:
+
+- system design
+- backend services
+- agentic tools
+- APIs and connectors
+- AI product builds
+- security-sensitive work
+- production planning
+- codebase-aware implementation
+
+## When not to use it
+
+Do not force it onto trivial work.
+
+For example, it is probably unnecessary for:
+
+- tiny copy fixes
+- isolated one-line edits
+- obvious local refactors
+- purely mechanical changes
+
+The point is to improve task completion quality, not to add ceremony.
 
 ## Extending it
 
-Add a domain by dropping `questions/15-yourdomain.md` in, following the existing shape (Priority 1 → sections → Verification), then add a row to the signal table in `SKILL.md` and `PROMPT.md` so it gets picked up dynamically.
+To add a new domain:
+
+1. Add a new full question file under `questions/`.
+2. Add a matching compact file under `questions/core/`.
+3. Follow the same structure:
+   - Priority 1
+   - themed sections
+   - Verification
+4. Add signal-routing logic in `SKILL.md` and `PROMPT.md`.
+
+If you add a domain without a matching core file, default behavior becomes less efficient.
+
+## Roadmap direction
+
+A natural next step is knowledge-backed question packs.
+
+That means using books, standards, postmortems, and domain-specific sources to curate better questions and better trade-off detection.
+
+Examples:
+
+- DDIA-backed system design questions
+- threat-modeling-backed security questions
+- SRE/postmortem-backed reliability questions
+- LLM-eval-backed agent questions
+
+That keeps Socratic as the loop engine while improving the depth of its internal questions.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Use it, fork it, ship it.
+MIT. See [LICENSE](LICENSE).
 
 ## Contributing
 
-PRs welcome, especially:
+PRs are useful for:
 
-- Domains not covered (embedded, games, blockchain, hardware, accessibility-in-depth)
-- Questions that came from a real incident — those are the good ones
-- Better signal words for dynamic domain detection
+- new domains
+- better signal routing
+- stronger verification blocks
+- high-signal core reductions
+- questions that came from real incidents
+- domain packs backed by strong engineering sources
