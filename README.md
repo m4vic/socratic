@@ -1,6 +1,6 @@
 # Socratic
 
-*Meta — questioning about questioning. Question yourself till you're left with only answers.*
+*Meta - questioning about questioning. Question yourself till you're left with only answers.*
 
 **697 questions a senior engineer asks before writing code — packaged as a Claude/Codex skill and a portable prompt.**
 
