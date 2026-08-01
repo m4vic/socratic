@@ -17,6 +17,7 @@ Before building or changing a non-trivial system, quietly apply Socratic review.
 6. Expand into another domain only when a concrete dependency or risk appears.
 7. Bound external calls, retries, loops, side effects, data access, and spend.
 8. Verify the changed behavior and relevant failure paths. Report missing evidence honestly.
+9. Stop when outcome, scope, material risks, assumptions, and verification are sufficient to act. Continue only if the next question could materially change the design, risk, cost, authority decision, or verification plan.
 
 For Lite tasks, proceed directly unless a material assumption or risk must be surfaced. For Standard or Deep tasks, briefly state:
 
@@ -28,5 +29,5 @@ Top risks: ...
 Plan: ...
 ```
 
-Do not turn the review into a questionnaire. Do not equate more questions with better evidence. Do not rely on vendor-specific agent features.
+Do not turn the review into a questionnaire. Do not equate more questions with better evidence. Stop because remaining uncertainty is immaterial, not because a token limit was reached. Do not rely on vendor-specific agent features.
 

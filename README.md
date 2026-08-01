@@ -16,6 +16,14 @@ It helps an LLM slow down, inspect the task, ask itself the right engineering qu
 
 Not a form. Not a checklist. A lightweight reasoning loop.
 
+## The stopping rule: question until the answer is solid
+
+Socratic is not a 697-question checklist and it is not an endless reasoning loop. It asks the smallest set of relevant questions needed to reach a solid, evidence-backed answer.
+
+The agent stops expanding its review when the outcome and scope are clear, consequential assumptions are visible, material risks have a mitigation or verification path, no contradiction changes the plan, and the riskiest assumption can be tested proportionately. If the next question would not change the design, risk, cost, authority decision, or verification plan, it is no longer material.
+
+This is the purpose of self-interrogation: let an agent challenge its own plan from several useful directions, satisfy the meaningful uncertainty, and then build. It should never keep thinking merely to consume tokens, nor stop only because a token budget is low.
+
 ## How it actually works
 
 **The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call). You see the outcome — a short "here's what I considered and assumed"
@@ -62,6 +70,29 @@ The point is not to ask more questions.
 The point is to ask the most useful questions at the right time without burning unnecessary context.
    
 If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
+
+## Knowledge-backed packs
+
+`questions/` and `packs/` have different jobs:
+
+- **Questions** provide coverage: they identify the concerns a task must resolve across requirements, security, data, testing, and other domains.
+- **Packs** provide depth: they add compact, source-backed reasoning for a specialist decision area after the relevant questions have been selected.
+
+Neither replaces the other. A great book does not cover every product, security, testing, or operational concern; a broad question bank does not contain every hard-won systems-design tradeoff.
+
+The starter structure includes:
+
+- [`packs/registry.md`](packs/registry.md) for deterministic pack selection
+- [`packs/software-design/core.md`](packs/software-design/core.md) for complexity, interfaces, and accidental generality
+- [`packs/data-systems/core.md`](packs/data-systems/core.md) for distributed data, reliability, and change-management tradeoffs
+- [`packs/threat-modeling/core.md`](packs/threat-modeling/core.md) for trust boundaries, abuse paths, and security mitigations
+- [`packs/ai-engineering/core.md`](packs/ai-engineering/core.md) for LLM evaluation, reliability, retrieval, tools, cost, and versioning
+
+For each task, the agent first selects the base domains and Core/Full depth, then reads the compact pack registry and adds zero to two relevant packs only where they sharpen the decision. Pack names describe the capability they add; their book sources are documented as provenance.
+
+## Book-derived knowledge, compressed for agents
+
+Socratic does not copy books into an agent context. It curates reusable decision patterns into short cards: what to ask, the default answer, tradeoffs, common mistakes, escalation conditions, and how to verify the decision. This gives an agent a practical form of self-interrogation: it can question its plan with accumulated engineering knowledge before it builds.
 
 ## What's in it
 
@@ -118,11 +149,11 @@ cp -r socratic ~/.claude/skills/
 
 ### 2. As a Codex skill
 
-Codex uses a different skill directory (`.agents/skills`, not `.claude/skills`):
+Install under `$CODEX_HOME/skills`; when `CODEX_HOME` is unset, use `~/.codex/skills`:
 
 ```bash
-mkdir -p ~/.agents/skills
-cp -r socratic ~/.agents/skills/
+mkdir -p ~/.codex/skills
+cp -r socratic ~/.codex/skills/
 ```
 
 Invoke explicitly with `$socratic`, or let it trigger implicitly when your request matches.
@@ -130,6 +161,8 @@ Invoke explicitly with `$socratic`, or let it trigger implicitly when your reque
 ### 3. As a portable prompt
 
 Paste [`PROMPT.md`](PROMPT.md) into the system prompt of any LLM — ChatGPT, Gemini, a local model, your own agent framework. Self-contained, no file dependencies.
+
+For an always-on prompt with minimal overhead, use [`PROMPT_LITE.md`](PROMPT_LITE.md).
 
 ## The self-interrogation loop
 
@@ -159,6 +192,8 @@ Run Verification for every domain in the final set, including ones added mid-bui
 ## Extending it
 
 Add a domain by dropping `questions/15-yourdomain.md` in, following the existing shape (Priority 1 → sections → Verification), then add a row to the signal table in `SKILL.md` and `PROMPT.md` so it gets picked up dynamically.
+
+For source-backed specialist knowledge, add a pack under `packs/<name>/core.md` and optionally `packs/<name>/full.md`. Keep packs compact and decision-shaped rather than writing long summaries.
 
 ## License
 
