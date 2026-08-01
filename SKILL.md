@@ -42,7 +42,7 @@ For every build, include Requirements and Testing. Then inspect both the request
 
 Do not stop at the first match. A connector, for example, normally pulls in API, Security, and Testing. If answering one domain reveals another dependency, add that domain and continue until a complete pass reveals no new domains.
 
-### 2. Load the smallest sufficient question depth
+### 2. Load the smallest sufficient base question depth
 
 Keep the user-facing behavior unchanged while controlling context use:
 
@@ -54,7 +54,26 @@ Treat `$socratic lite` or `$socratic quick` as an explicit Core request. Treat `
 
 Questions consume context even when asked silently. Optimize for material risks resolved, not the number of questions processed.
 
-### 3. Self-answer every loaded question
+### 3. Add specialized knowledge packs only when they sharpen the task
+
+Base domain files stay primary. Packs are optional overlays, not replacements.
+
+- Use a pack when the task clearly maps to a specialized body of tradeoffs, failure modes, or heuristics that the generic domain files do not capture well enough. First consult `packs/registry.md` after selecting the base domains.
+- Load the matching file under `packs/<pack>/core.md` or `packs/<pack>/full.md` after the base domain files.
+- Prefer zero to two packs per task. Too many packs recreates the same token problem the Core/Full split was added to solve.
+- Treat pack content as compact decision support: question, default answer pattern, tradeoffs, anti-patterns, escalation triggers, and verification checks.
+- Select a pack by the capability it adds, not by recognising a book title. Its source material is provenance, not the routing rule.
+- If you need pack structure or naming guidance, read `references/knowledge-pack-architecture.md`.
+
+Examples:
+
+- Use `packs/software-design/core.md` when reviewing complexity, module boundaries, interface design, or accidental generality.
+- Use `packs/data-systems/core.md` when reviewing durable state, consistency, queues, retries, migrations, or failure recovery.
+- Use `packs/threat-modeling/core.md` when mapping trust boundaries, attacker paths, abuse cases, mitigations, or security verification.
+- Use `packs/ai-engineering/core.md` when building an LLM product, RAG system, agent, model evaluation, or tool-enabled workflow.
+- Future packs such as `startup-strategy` or `marketing-strategy` should follow the same overlay pattern.
+
+### 4. Self-answer the selected material questions
 
 Resolve each selected question in this order:
 
@@ -64,7 +83,21 @@ Resolve each selected question in this order:
 
 Do this silently. The user should see the resulting decisions, not the raw question bank.
 
-### 4. Emit the output contract once
+### 5. Run a sufficiency check and stop deliberately
+
+Socratic is not an instruction to exhaust a questionnaire. Its purpose is to reduce material uncertainty until the agent has a solid, evidence-backed basis to act.
+
+After each domain or decision cluster, stop expanding the review when all of the following are true:
+
+1. The requested outcome, scope, and consequential assumptions are clear.
+2. Every material risk has a mitigation, a verification step, an explicit acceptance by the appropriate authority, or a clearly stated escalation.
+3. No unresolved contradiction changes the implementation plan.
+4. The next plausible question would not materially change the design, risk, cost, authority decision, or verification plan.
+5. The plan has a proportionate way to falsify its riskiest assumptions.
+
+If any condition fails, add the smallest relevant domain, deeper question depth, or pack. Do not continue merely to use more questions, and do not stop merely because a token budget is low. Stop because the remaining uncertainty is immaterial to the current task.
+
+### 6. Emit the output contract once
 
 Before implementation, emit:
 
@@ -79,9 +112,9 @@ Plan: <what will be built>
 
 Batch any genuinely blocking open questions. Do not turn the interrogation into the deliverable.
 
-### 5. Build and verify
+### 7. Build and verify
 
-Build after blocking decisions are resolved. Apply the Verification guidance from every loaded domain, including domains added during the review. Report what passed, failed, or could not be verified without external access.
+Build after blocking decisions are resolved. Apply the Verification guidance from every loaded domain and pack, including anything added during the review. Report what passed, failed, or could not be verified without external access.
 
 ## Interactive mode
 
