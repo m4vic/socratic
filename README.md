@@ -28,6 +28,38 @@ Not a form. Not a checklist. A lightweight reasoning loop.
 6. build
 7. verify
 
+
+## Core and Full modes
+The full question bank contains 697 questions across engineering domains.
+That is useful for production-grade, high-risk, or audit-style work, but too expensive to load by default for many agentic workflows.
+So Socratic now has two depths:
+
+### Core
+Core is the default path.
+It loads the highest-signal subset of questions first: roughly the top 90 questions that matter most across routine, prototype, internal, and moderately scoped work.
+Use Core for:
+- prototypes
+- internal tools
+- one-off builds
+- medium-scope engineering work
+- most day-to-day agentic tasks
+### Full
+Full loads the complete domain files.
+Use Full for:
+- production systems
+- public APIs
+- authentication
+- payments
+- PII or regulated data
+- autonomous tools
+- costly or irreversible actions
+- deep audits
+- explicit high-risk reviews
+
+
+### Why this split matters
+The point is not to ask more questions.
+The point is to ask the most useful questions at the right time without burning unnecessary context.
    
 If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
