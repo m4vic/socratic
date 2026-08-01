@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/pix.png" alt="Socratic Logo" width="180">
+  <img src="assets/pix.png" alt="Socratic Logo" width="380">
 </p>
 
 <h1 align="center">Socratic</h1>
