@@ -10,13 +10,18 @@
 
 
 
-**Socratic** is a self-interrogation skill for agentic AI packaging 697 questions a senior engineer asks before writing a single line of code into a portable Claude and Codex skill/prompt.
+**Socratic** is a self-interrogation skill for agentic AI, packaged as a portable Claude and Codex skill or prompt.
 
 It helps an LLM slow down, inspect the task, ask itself the right engineering questions, and only ask the user for the few decisions that actually require human authority.
 
-Not a form. Not a checklist. A lightweight reasoning loop.
+Two halves work together:
 
-Ten source-backed **packs** add depth where the questions alone stop — Kleppmann on data, Nygard on production failure, Evans on domain boundaries, Feathers on legacy code, and more. A typical run costs about **3,000 tokens**.
+- **697 questions** across 15 engineering domains — *what* a task must resolve
+- **60 decision cards** in 10 source-backed packs — *how* experienced engineers resolve it, distilled from Kleppmann, Nygard, Evans, Ousterhout, Feathers, Khorikov, and others
+
+Neither is loaded whole. The agent selects the slice the task actually signals, so a typical run costs about **3,000 tokens**.
+
+Not a form. Not a checklist. A lightweight reasoning loop.
 
 ## The stopping rule: question until the answer is solid
 
