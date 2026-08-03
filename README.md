@@ -16,6 +16,8 @@ It helps an LLM slow down, inspect the task, ask itself the right engineering qu
 
 Not a form. Not a checklist. A lightweight reasoning loop.
 
+Ten source-backed **packs** add depth where the questions alone stop — Kleppmann on data, Nygard on production failure, Evans on domain boundaries, Feathers on legacy code, and more. A typical run costs about **3,000 tokens**.
+
 ## The stopping rule: question until the answer is solid
 
 Socratic is not a 697-question checklist and it is not an endless reasoning loop. It asks the smallest set of relevant questions needed to reach a solid, evidence-backed answer.
@@ -43,6 +45,8 @@ Plan:                    durable enqueue → worker drain → backoff on failure
 
 One question instead of twelve. The other eleven were answered from your repo.
 
+The loop behind it:
+
 1. classify the task
 2. detect the relevant domains
 3. load the smallest useful question set
@@ -50,6 +54,8 @@ One question instead of twelve. The other eleven were answered from your repo.
 5. surface assumptions, risks, and only necessary open questions
 6. build
 7. verify
+
+If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
 
 ## Core and Full modes
@@ -99,8 +105,6 @@ The whole repository is roughly 29,000 tokens. A normal run loads under a tenth 
 For scale: the median `SKILL.md` across Anthropic's 31 officially published skills is **2,255 tokens**. Socratic's entry point is the same size as a first-party skill — the depth lives in files that stay on disk until the task calls for them.
 
 **The Core/Full split is worth 7.5×.** All fifteen compact domain files together are 1,804 tokens; the fifteen complete ones are 13,599. Core files average about 120 tokens each, so even a maximal compact pass costs less than the skill's own instructions.
-   
-If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
 ## Knowledge-backed packs
 
@@ -111,9 +115,7 @@ If you'd rather be interviewed live, ask for it ("interview me," "ask me one at 
 
 Neither replaces the other. A great book does not cover every product, security, testing, or operational concern; a broad question bank does not contain every hard-won systems-design tradeoff.
 
-The starter structure includes:
-
-[`packs/registry.md`](packs/registry.md) routes between them:
+Ten packs ship today, each a handful of decision cards rather than a summary. [`packs/registry.md`](packs/registry.md) routes between them:
 
 | Pack | Depth it adds | Source |
 |---|---|---|
@@ -130,11 +132,13 @@ The starter structure includes:
 
 For each task, the agent first selects the base domains and Core/Full depth, then reads the compact pack registry and adds zero to two relevant packs only where they sharpen the decision. Pack names describe the capability they add; their book sources are documented as provenance.
 
-`agent-design` is the one pack that isn't book-derived. Its decision cards come from structure observed across 34 agents shipped in first-party Claude Code plugins, where seven archetypes recur and the agent that does the work is never the one that verifies it. Structure observed in production beats structure argued from first principles.
+Several packs overlap on purpose, so the registry says which to reach for: `software-design` covers module depth where `domain-modeling` covers where the boundaries fall; `data-systems` covers correctness of state under failure where `operations` covers staying available while failure happens; the Testing domain establishes what must be covered where `testing-design` decides whether the tests are worth keeping.
 
-## Book-derived knowledge, compressed for agents
+`agent-design` is the one pack that isn't book-derived. Its cards come from structure observed across 34 agents shipped in first-party Claude Code plugins, where seven archetypes recur and the agent that does the work is never the one that verifies it. Structure observed in production beats structure argued from first principles.
 
-Socratic does not copy books into an agent context. It curates reusable decision patterns into short cards: what to ask, the default answer, tradeoffs, common mistakes, escalation conditions, and how to verify the decision. This gives an agent a practical form of self-interrogation: it can question its plan with accumulated engineering knowledge before it builds.
+### Books, compressed for agents — not summarized
+
+Socratic does not copy books into an agent context. It curates their reusable decision patterns into short cards: what to ask, the default answer, the tradeoff, the common mistake, when to escalate, and how to verify the choice. A pack is judged by whether it improves a real implementation decision — never by how much of the book it covers.
 
 ## What's in it
 
