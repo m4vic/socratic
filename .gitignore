@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Generated
+everything.md
+dist/
+node_modules/
+
+# Env
+.env
+.env.local

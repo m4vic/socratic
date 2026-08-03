@@ -10,9 +10,16 @@
 
 
 
-**Socratic** is a self-interrogation skill for agentic AI packaging 697 questions a senior engineer asks before writing a single line of code into a portable Claude and Codex skill/prompt.
+**Socratic** is a self-interrogation skill for agentic AI, packaged as a portable Claude and Codex skill or prompt.
 
 It helps an LLM slow down, inspect the task, ask itself the right engineering questions, and only ask the user for the few decisions that actually require human authority.
+
+Two halves work together:
+
+- **697 questions** across 15 engineering domains — *what* a task must resolve
+- **60 decision cards** in 10 source-backed packs — *how* experienced engineers resolve it, distilled from Kleppmann, Nygard, Evans, Ousterhout, Feathers, Khorikov, and others
+
+Neither is loaded whole. The agent selects the slice the task actually signals, so a typical run costs about **3,000 tokens**.
 
 Not a form. Not a checklist. A lightweight reasoning loop.
 
@@ -26,7 +33,24 @@ This is the purpose of self-interrogation: let an agent challenge its own plan f
 
 ## How it actually works
 
-**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call). You see the outcome — a short "here's what I considered and assumed"
+**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call).
+
+What you see is a short contract before any code is written:
+
+```text
+Domains considered:      requirements, data, security, testing, AI/LLM
+Self-answered:           Postgres over SQLite (existing driver, concurrent writers)
+                         at-least-once delivery; duplicate work is safe here
+                         no PII in the queue, so no encryption-at-rest work
+Assumed (flag if wrong): single-region; retries capped at 5
+Open questions for you:  1. Is a 30-second worst-case job latency acceptable?
+Top risks:               retry storm on downstream outage — no circuit breaker yet
+Plan:                    durable enqueue → worker drain → backoff on failure
+```
+
+One question instead of twelve. The other eleven were answered from your repo.
+
+The loop behind it:
 
 1. classify the task
 2. detect the relevant domains
@@ -35,6 +59,8 @@ This is the purpose of self-interrogation: let an agent challenge its own plan f
 5. surface assumptions, risks, and only necessary open questions
 6. build
 7. verify
+
+If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
 
 ## Core and Full modes
@@ -68,8 +94,22 @@ Use Full for:
 ### Why this split matters
 The point is not to ask more questions.
 The point is to ask the most useful questions at the right time without burning unnecessary context.
-   
-If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
+
+### What it actually costs
+
+The whole repository is roughly 29,000 tokens. A normal run loads under a tenth of it. Counted with `tiktoken` (`o200k_base`), not estimated:
+
+| What loads | Tokens | When |
+|---|---:|---|
+| `SKILL.md` | ~2,300 | Every run |
+| **Typical pass** — SKILL + 4 core domains | **~2,800** | Most work |
+| All 15 core domains | ~4,100 | Broad prototype review |
+| Heavy pass — SKILL + 8 full domains + 1 pack | ~10,900 | Production, money, PII |
+| Entire repository | ~29,000 | Never |
+
+For scale: the median `SKILL.md` across Anthropic's 31 officially published skills is **2,255 tokens**. Socratic's entry point is the same size as a first-party skill — the depth lives in files that stay on disk until the task calls for them.
+
+**The Core/Full split is worth 7.5×.** All fifteen compact domain files together are 1,804 tokens; the fifteen complete ones are 13,599. Core files average about 120 tokens each, so even a maximal compact pass costs less than the skill's own instructions.
 
 ## Knowledge-backed packs
 
@@ -80,19 +120,30 @@ If you'd rather be interviewed live, ask for it ("interview me," "ask me one at 
 
 Neither replaces the other. A great book does not cover every product, security, testing, or operational concern; a broad question bank does not contain every hard-won systems-design tradeoff.
 
-The starter structure includes:
+Ten packs ship today, each a handful of decision cards rather than a summary. [`packs/registry.md`](packs/registry.md) routes between them:
 
-- [`packs/registry.md`](packs/registry.md) for deterministic pack selection
-- [`packs/software-design/core.md`](packs/software-design/core.md) for complexity, interfaces, and accidental generality
-- [`packs/data-systems/core.md`](packs/data-systems/core.md) for distributed data, reliability, and change-management tradeoffs
-- [`packs/threat-modeling/core.md`](packs/threat-modeling/core.md) for trust boundaries, abuse paths, and security mitigations
-- [`packs/ai-engineering/core.md`](packs/ai-engineering/core.md) for LLM evaluation, reliability, retrieval, tools, cost, and versioning
+| Pack | Depth it adds | Source |
+|---|---|---|
+| [`software-design`](packs/software-design/core.md) | complexity, interfaces, accidental generality | *A Philosophy of Software Design* |
+| [`domain-modeling`](packs/domain-modeling/core.md) | boundaries, aggregates, ubiquitous language | *Domain-Driven Design* |
+| [`data-systems`](packs/data-systems/core.md) | distributed data, consistency, migrations | *Designing Data-Intensive Applications* |
+| [`operations`](packs/operations/core.md) | timeouts, retries, load shedding, rollback, alerting | *Release It!*, Google *SRE* |
+| [`threat-modeling`](packs/threat-modeling/core.md) | trust boundaries, abuse paths, mitigations | *Threat Modeling*, *Security Engineering* |
+| [`ai-engineering`](packs/ai-engineering/core.md) | LLM evals, retrieval, tools, serving cost | *AI Engineering* |
+| [`agent-design`](packs/agent-design/core.md) | agent boundaries, tool permissions, verification | 34 shipped agents (empirical) |
+| [`legacy-change`](packs/legacy-change/core.md) | seams, characterization tests, incremental replacement | *Working Effectively with Legacy Code*, *Refactoring* |
+| [`testing-design`](packs/testing-design/core.md) | what to test, what to mock, why a suite is untrusted | *Unit Testing: Principles, Practices, and Patterns* |
+| [`product-discovery`](packs/product-discovery/core.md) | whether the thing should exist at all | *The Mom Test*, *Inspired* |
 
 For each task, the agent first selects the base domains and Core/Full depth, then reads the compact pack registry and adds zero to two relevant packs only where they sharpen the decision. Pack names describe the capability they add; their book sources are documented as provenance.
 
-## Book-derived knowledge, compressed for agents
+Several packs overlap on purpose, so the registry says which to reach for: `software-design` covers module depth where `domain-modeling` covers where the boundaries fall; `data-systems` covers correctness of state under failure where `operations` covers staying available while failure happens; the Testing domain establishes what must be covered where `testing-design` decides whether the tests are worth keeping.
 
-Socratic does not copy books into an agent context. It curates reusable decision patterns into short cards: what to ask, the default answer, tradeoffs, common mistakes, escalation conditions, and how to verify the decision. This gives an agent a practical form of self-interrogation: it can question its plan with accumulated engineering knowledge before it builds.
+`agent-design` is the one pack that isn't book-derived. Its cards come from structure observed across 34 agents shipped in first-party Claude Code plugins, where seven archetypes recur and the agent that does the work is never the one that verifies it. Structure observed in production beats structure argued from first principles.
+
+### Books, compressed for agents — not summarized
+
+Socratic does not copy books into an agent context. It curates their reusable decision patterns into short cards: what to ask, the default answer, the tradeoff, the common mistake, when to escalate, and how to verify the choice. A pack is judged by whether it improves a real implementation decision — never by how much of the book it covers.
 
 ## What's in it
 

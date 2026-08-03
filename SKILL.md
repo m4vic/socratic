@@ -1,6 +1,6 @@
 ---
 name: socratic
-description: Meta — questioning about questioning. Question yourself till you're left with only answers. Use whenever the user asks to build, design, scaffold, or architect any system, feature, service, app, agent, pipeline, connector, or tool — especially when the request is short, vague, or underspecified. By default the agent interrogates ITSELF silently across the relevant engineering domains (frontend, backend, data, security, infra, AI/LLM, mobile, API, testing, product, cost, compliance) and reasons its way to answers, surfacing only the few decisions that truly need the user's input. Also use when reviewing an existing design for gaps, or when the user says "what am I missing," "review this architecture," or "ask me the right questions."
+description: This skill should be used when the user asks to "build", "design", "scaffold", "architect", or "plan" any system, feature, service, app, agent, pipeline, connector, or tool — especially when the request is short, vague, or underspecified. It should also be used when the user asks to "review this architecture", "what am I missing", "ask me the right questions", "poke holes in this", or requests a design review before implementation. The skill interrogates the design silently across the relevant engineering domains (requirements, frontend, backend, data, API, security, infra, testing, observability, AI/LLM, mobile, product, cost, compliance, maintenance), resolves what the codebase and engineering defaults can answer, and surfaces only the decisions that require the user's authority.
 ---
 
 
@@ -59,19 +59,26 @@ Questions consume context even when asked silently. Optimize for material risks 
 Base domain files stay primary. Packs are optional overlays, not replacements.
 
 - Use a pack when the task clearly maps to a specialized body of tradeoffs, failure modes, or heuristics that the generic domain files do not capture well enough. First consult `packs/registry.md` after selecting the base domains.
-- Load the matching file under `packs/<pack>/core.md` or `packs/<pack>/full.md` after the base domain files.
+- Load `packs/<pack>/core.md` after the base domain files. A pack may also provide `full.md`; load it only when the core pack proves insufficient for the decision at hand. Most packs ship core only.
 - Prefer zero to two packs per task. Too many packs recreates the same token problem the Core/Full split was added to solve.
 - Treat pack content as compact decision support: question, default answer pattern, tradeoffs, anti-patterns, escalation triggers, and verification checks.
 - Select a pack by the capability it adds, not by recognising a book title. Its source material is provenance, not the routing rule.
-- If you need pack structure or naming guidance, read `references/knowledge-pack-architecture.md`.
+- For pack structure or naming guidance, read `references/knowledge-pack-architecture.md`.
 
 Examples:
 
 - Use `packs/software-design/core.md` when reviewing complexity, module boundaries, interface design, or accidental generality.
+- Use `packs/domain-modeling/core.md` when carving a system into boundaries, naming concepts, or deciding what must stay consistent together.
 - Use `packs/data-systems/core.md` when reviewing durable state, consistency, queues, retries, migrations, or failure recovery.
+- Use `packs/operations/core.md` when the work must survive production — timeouts, retries, load shedding, rollback, or alerting.
 - Use `packs/threat-modeling/core.md` when mapping trust boundaries, attacker paths, abuse cases, mitigations, or security verification.
-- Use `packs/ai-engineering/core.md` when building an LLM product, RAG system, agent, model evaluation, or tool-enabled workflow.
-- Future packs such as `startup-strategy` or `marketing-strategy` should follow the same overlay pattern.
+- Use `packs/ai-engineering/core.md` when building an LLM product, RAG system, model evaluation, or tool-enabled workflow.
+- Use `packs/agent-design/core.md` when building an agent or subagent, splitting work across agents, setting tool permissions, or deciding how agent output gets verified.
+- Use `packs/legacy-change/core.md` when modifying code that already works, has no tests, or is being replaced incrementally.
+- Use `packs/testing-design/core.md` when deciding what to test, what to mock, or why a suite is brittle or untrusted.
+- Use `packs/product-discovery/core.md` when the value of the thing itself is unproven — before the engineering packs, not alongside them.
+
+New packs follow the same overlay pattern. Consult `packs/registry.md` for pairings and for choosing between adjacent packs.
 
 ### 4. Self-answer the selected material questions
 
