@@ -26,7 +26,22 @@ This is the purpose of self-interrogation: let an agent challenge its own plan f
 
 ## How it actually works
 
-**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call). You see the outcome — a short "here's what I considered and assumed"
+**The agent interviews itself, not you.** Point it at a task, and it silently works through the relevant slice of the question bank — reading the codebase where it can, applying sensible engineering defaults where it can't, and only stopping to ask you about the handful of decisions that are genuinely yours to make (budget, vendor, legal risk, an irreversible call).
+
+What you see is a short contract before any code is written:
+
+```text
+Domains considered:      requirements, data, security, testing, AI/LLM
+Self-answered:           Postgres over SQLite (existing driver, concurrent writers)
+                         at-least-once delivery; duplicate work is safe here
+                         no PII in the queue, so no encryption-at-rest work
+Assumed (flag if wrong): single-region; retries capped at 5
+Open questions for you:  1. Is a 30-second worst-case job latency acceptable?
+Top risks:               retry storm on downstream outage — no circuit breaker yet
+Plan:                    durable enqueue → worker drain → backoff on failure
+```
+
+One question instead of twelve. The other eleven were answered from your repo.
 
 1. classify the task
 2. detect the relevant domains
@@ -68,6 +83,22 @@ Use Full for:
 ### Why this split matters
 The point is not to ask more questions.
 The point is to ask the most useful questions at the right time without burning unnecessary context.
+
+### What it actually costs
+
+The whole repository is roughly 29,000 tokens. A normal run loads under a tenth of it. Counted with `tiktoken` (`o200k_base`), not estimated:
+
+| What loads | Tokens | When |
+|---|---:|---|
+| `SKILL.md` | ~2,300 | Every run |
+| **Typical pass** — SKILL + 4 core domains | **~2,800** | Most work |
+| All 15 core domains | ~4,100 | Broad prototype review |
+| Heavy pass — SKILL + 8 full domains + 1 pack | ~10,900 | Production, money, PII |
+| Entire repository | ~29,000 | Never |
+
+For scale: the median `SKILL.md` across Anthropic's 31 officially published skills is **2,255 tokens**. Socratic's entry point is the same size as a first-party skill — the depth lives in files that stay on disk until the task calls for them.
+
+**The Core/Full split is worth 7.5×.** All fifteen compact domain files together are 1,804 tokens; the fifteen complete ones are 13,599. Core files average about 120 tokens each, so even a maximal compact pass costs less than the skill's own instructions.
    
 If you'd rather be interviewed live, ask for it ("interview me," "ask me one at a time") and it switches to a one-yes/no-question-per-turn mode instead. That's opt-in, not the default.
 
@@ -87,8 +118,12 @@ The starter structure includes:
 - [`packs/data-systems/core.md`](packs/data-systems/core.md) for distributed data, reliability, and change-management tradeoffs
 - [`packs/threat-modeling/core.md`](packs/threat-modeling/core.md) for trust boundaries, abuse paths, and security mitigations
 - [`packs/ai-engineering/core.md`](packs/ai-engineering/core.md) for LLM evaluation, reliability, retrieval, tools, cost, and versioning
+- [`packs/agent-design/core.md`](packs/agent-design/core.md) for agent boundaries, tool permissions, model tiering, and verifying agent output
+- [`packs/operations/core.md`](packs/operations/core.md) for timeouts, retries, load shedding, rollback, and alerting
 
 For each task, the agent first selects the base domains and Core/Full depth, then reads the compact pack registry and adds zero to two relevant packs only where they sharpen the decision. Pack names describe the capability they add; their book sources are documented as provenance.
+
+`agent-design` is the one pack that isn't book-derived. Its decision cards come from structure observed across 34 agents shipped in first-party Claude Code plugins, where seven archetypes recur and the agent that does the work is never the one that verifies it. Structure observed in production beats structure argued from first principles.
 
 ## Book-derived knowledge, compressed for agents
 
