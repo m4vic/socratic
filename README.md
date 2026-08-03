@@ -113,13 +113,20 @@ Neither replaces the other. A great book does not cover every product, security,
 
 The starter structure includes:
 
-- [`packs/registry.md`](packs/registry.md) for deterministic pack selection
-- [`packs/software-design/core.md`](packs/software-design/core.md) for complexity, interfaces, and accidental generality
-- [`packs/data-systems/core.md`](packs/data-systems/core.md) for distributed data, reliability, and change-management tradeoffs
-- [`packs/threat-modeling/core.md`](packs/threat-modeling/core.md) for trust boundaries, abuse paths, and security mitigations
-- [`packs/ai-engineering/core.md`](packs/ai-engineering/core.md) for LLM evaluation, reliability, retrieval, tools, cost, and versioning
-- [`packs/agent-design/core.md`](packs/agent-design/core.md) for agent boundaries, tool permissions, model tiering, and verifying agent output
-- [`packs/operations/core.md`](packs/operations/core.md) for timeouts, retries, load shedding, rollback, and alerting
+[`packs/registry.md`](packs/registry.md) routes between them:
+
+| Pack | Depth it adds | Source |
+|---|---|---|
+| [`software-design`](packs/software-design/core.md) | complexity, interfaces, accidental generality | *A Philosophy of Software Design* |
+| [`domain-modeling`](packs/domain-modeling/core.md) | boundaries, aggregates, ubiquitous language | *Domain-Driven Design* |
+| [`data-systems`](packs/data-systems/core.md) | distributed data, consistency, migrations | *Designing Data-Intensive Applications* |
+| [`operations`](packs/operations/core.md) | timeouts, retries, load shedding, rollback, alerting | *Release It!*, Google *SRE* |
+| [`threat-modeling`](packs/threat-modeling/core.md) | trust boundaries, abuse paths, mitigations | *Threat Modeling*, *Security Engineering* |
+| [`ai-engineering`](packs/ai-engineering/core.md) | LLM evals, retrieval, tools, serving cost | *AI Engineering* |
+| [`agent-design`](packs/agent-design/core.md) | agent boundaries, tool permissions, verification | 34 shipped agents (empirical) |
+| [`legacy-change`](packs/legacy-change/core.md) | seams, characterization tests, incremental replacement | *Working Effectively with Legacy Code*, *Refactoring* |
+| [`testing-design`](packs/testing-design/core.md) | what to test, what to mock, why a suite is untrusted | *Unit Testing: Principles, Practices, and Patterns* |
+| [`product-discovery`](packs/product-discovery/core.md) | whether the thing should exist at all | *The Mom Test*, *Inspired* |
 
 For each task, the agent first selects the base domains and Core/Full depth, then reads the compact pack registry and adds zero to two relevant packs only where they sharpen the decision. Pack names describe the capability they add; their book sources are documented as provenance.
 

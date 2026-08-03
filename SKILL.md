@@ -68,12 +68,17 @@ Base domain files stay primary. Packs are optional overlays, not replacements.
 Examples:
 
 - Use `packs/software-design/core.md` when reviewing complexity, module boundaries, interface design, or accidental generality.
+- Use `packs/domain-modeling/core.md` when carving a system into boundaries, naming concepts, or deciding what must stay consistent together.
 - Use `packs/data-systems/core.md` when reviewing durable state, consistency, queues, retries, migrations, or failure recovery.
+- Use `packs/operations/core.md` when the work must survive production — timeouts, retries, load shedding, rollback, or alerting.
 - Use `packs/threat-modeling/core.md` when mapping trust boundaries, attacker paths, abuse cases, mitigations, or security verification.
 - Use `packs/ai-engineering/core.md` when building an LLM product, RAG system, model evaluation, or tool-enabled workflow.
 - Use `packs/agent-design/core.md` when building an agent or subagent, splitting work across agents, setting tool permissions, or deciding how agent output gets verified.
-- Use `packs/operations/core.md` when the work must survive production — timeouts, retries, load shedding, rollback, or alerting.
-- Future packs such as `domain-modeling`, `legacy-change`, or `product-discovery` should follow the same overlay pattern.
+- Use `packs/legacy-change/core.md` when modifying code that already works, has no tests, or is being replaced incrementally.
+- Use `packs/testing-design/core.md` when deciding what to test, what to mock, or why a suite is brittle or untrusted.
+- Use `packs/product-discovery/core.md` when the value of the thing itself is unproven — before the engineering packs, not alongside them.
+
+New packs follow the same overlay pattern. Consult `packs/registry.md` for pairings and for choosing between adjacent packs.
 
 ### 4. Self-answer the selected material questions
 
