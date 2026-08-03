@@ -17,3 +17,6 @@ node_modules/
 # Env
 .env
 .env.local
+
+# Local decision record - contains absolute paths, keep out of public history
+.readback/
