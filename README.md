@@ -1,4 +1,3 @@
-
 <p align="center">
   <img src="assets/pix.png" alt="Socratic Logo" width="380">
 </p>
@@ -10,12 +9,13 @@
   <a href="https://github.com/m4vic/socratic/stargazers"><img src="https://img.shields.io/github/stars/m4vic/socratic" alt="Stars"></a>
   <a href="https://github.com/m4vic/socratic/network/members"><img src="https://img.shields.io/github/forks/m4vic/socratic" alt="Forks"></a>
   <img src="https://img.shields.io/github/last-commit/m4vic/socratic" alt="Last Commit">
-  <img src="https://img.shields.io/github/issues/m4vic/socratic" alt="Issues">
+  <img src="https://img.shields.io/github/v/tag/m4vic/socratic" alt="Version">
 </p>
 
 <p align="center">
   Meta - questioning about questioning. Question yourself till you're left with only answers.
 </p>
+
 
 
 
