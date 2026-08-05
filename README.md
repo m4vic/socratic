@@ -1,14 +1,17 @@
+
 <p align="center">
   <img src="assets/pix.png" alt="Socratic Logo" width="380">
 </p>
 
 <h1 align="center">Socratic</h1>
 
-![License](https://img.shields.io/github/license/m4vic/socratic)
-[![Stars](https://img.shields.io/github/stars/m4vic/socratic)](https://github.com/m4vic/socratic/stargazers)
-[![Forks](https://img.shields.io/github/forks/m4vic/socratic)](https://github.com/m4vic/socratic/network/members)
-![Last Commit](https://img.shields.io/github/last-commit/m4vic/socratic)
-![Issues](https://img.shields.io/github/issues/m4vic/socratic)
+<p align="center">
+  <img src="https://img.shields.io/github/license/m4vic/socratic" alt="License">
+  <a href="https://github.com/m4vic/socratic/stargazers"><img src="https://img.shields.io/github/stars/m4vic/socratic" alt="Stars"></a>
+  <a href="https://github.com/m4vic/socratic/network/members"><img src="https://img.shields.io/github/forks/m4vic/socratic" alt="Forks"></a>
+  <img src="https://img.shields.io/github/last-commit/m4vic/socratic" alt="Last Commit">
+  <img src="https://img.shields.io/github/issues/m4vic/socratic" alt="Issues">
+</p>
 
 <p align="center">
   Meta - questioning about questioning. Question yourself till you're left with only answers.
