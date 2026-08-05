@@ -4,6 +4,12 @@
 
 <h1 align="center">Socratic</h1>
 
+![License](https://img.shields.io/github/license/m4vic/socratic)
+[![Stars](https://img.shields.io/github/stars/m4vic/socratic)](https://github.com/m4vic/socratic/stargazers)
+[![Forks](https://img.shields.io/github/forks/m4vic/socratic)](https://github.com/m4vic/socratic/network/members)
+![Last Commit](https://img.shields.io/github/last-commit/m4vic/socratic)
+![Issues](https://img.shields.io/github/issues/m4vic/socratic)
+
 <p align="center">
   Meta - questioning about questioning. Question yourself till you're left with only answers.
 </p>
