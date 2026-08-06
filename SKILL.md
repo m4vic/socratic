@@ -80,6 +80,14 @@ Examples:
 
 New packs follow the same overlay pattern. Consult `packs/registry.md` for pairings and for choosing between adjacent packs.
 
+### 3b. Check whether a target grade is active
+
+A grade is different from a pack: it does not add topic depth, it sets the target the whole run is aiming for and changes what "done" means. Load one when the user names a target explicitly — "make this production ready", "MVP is fine", "get this to production grade", `$socratic mvp`, `$socratic production` — or when the request states it ("this needs to survive real traffic", "just a prototype for now").
+
+Consult `grades/registry.md`, load the matching grade file, and follow the domains and packs it marks mandatory in addition to whatever the dynamic scan already selected. When a grade is active, its gate — not step 5's generic sufficiency check — decides when the run stops. No grade named means no change: proceed as below.
+
+Grades are cumulative: `enterprise` supersedes `production` supersedes `mvp`. Resolve the entire chain down to `mvp`, not only the items listed in the named grade's own file — each file states what it supersedes and does not repeat those items in different words, so there is exactly one definition of each check to satisfy, not several that could disagree.
+
 ### 4. Self-answer the selected material questions
 
 Resolve each selected question in this order:
@@ -93,6 +101,8 @@ Do this silently. The user should see the resulting decisions, not the raw quest
 ### 5. Run a sufficiency check and stop deliberately
 
 Socratic is not an instruction to exhaust a questionnaire. Its purpose is to reduce material uncertainty until the agent has a solid, evidence-backed basis to act.
+
+**If a grade is active, skip this step's five conditions and use the grade's gate instead** — stop when every gate item is resolved, mitigated with a stated reason, or marked not applicable, not when this section's conditions happen to be met. The rest of this step applies only when no grade was named.
 
 After each domain or decision cluster, stop expanding the review when all of the following are true:
 

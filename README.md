@@ -5,8 +5,17 @@
 <h1 align="center">Socratic</h1>
 
 <p align="center">
+  <img src="https://img.shields.io/github/license/m4vic/socratic" alt="License">
+  <a href="https://github.com/m4vic/socratic/stargazers"><img src="https://img.shields.io/github/stars/m4vic/socratic" alt="Stars"></a>
+  <a href="https://github.com/m4vic/socratic/network/members"><img src="https://img.shields.io/github/forks/m4vic/socratic" alt="Forks"></a>
+  <img src="https://img.shields.io/github/last-commit/m4vic/socratic" alt="Last Commit">
+  <img src="https://img.shields.io/github/v/tag/m4vic/socratic" alt="Version">
+</p>
+
+<p align="center">
   Meta - questioning about questioning. Question yourself till you're left with only answers.
 </p>
+
 
 
 
@@ -110,6 +119,20 @@ The whole repository is roughly 29,000 tokens. A normal run loads under a tenth 
 For scale: the median `SKILL.md` across Anthropic's 31 officially published skills is **2,255 tokens**. Socratic's entry point is the same size as a first-party skill — the depth lives in files that stay on disk until the task calls for them.
 
 **The Core/Full split is worth 7.5×.** All fifteen compact domain files together are 1,804 tokens; the fifteen complete ones are 13,599. Core files average about 120 tokens each, so even a maximal compact pass costs less than the skill's own instructions.
+
+## Grades: run it once, land at a stated bar
+
+Packs add depth on one topic. A **grade** sets the target for the whole run — say "make this production ready" or `$socratic production`, and it changes what "done" means and when the run stops.
+
+| Grade | Bar |
+|---|---|
+| [`grades/mvp.md`](grades/mvp.md) | Does the one core action actually work, end to end, and fail honestly when it can't |
+| [`grades/production.md`](grades/production.md) | Would an on-call engineer accept ownership of this at 3am |
+| [`grades/enterprise.md`](grades/enterprise.md) | Would this pass procurement, an audit, and a real regional outage |
+
+Grades are cumulative — `enterprise` supersedes `production` supersedes `mvp` — and each file only states what it *adds*, never repeating the tier below it. That's deliberate: an item is defined in exactly one place, so loading several grade files together can't produce two different answers to the same question. `production` pulls in the `operations`, `threat-modeling`, and `testing-design` packs as mandatory and links to their cards rather than re-explaining them, adding only what nothing else covers — a tested restore, not just a configured backup; a stated latency target; a runbook; a kill switch. `enterprise` adds the organizational layer on top — a drilled disaster recovery, an audit trail, tenant isolation, a compliance sign-off path — the things a procurement review checks that engineering alone doesn't.
+
+No grade named, nothing changes — the normal sufficiency check runs as before and nothing in `grades/` loads.
 
 ## Knowledge-backed packs
 
